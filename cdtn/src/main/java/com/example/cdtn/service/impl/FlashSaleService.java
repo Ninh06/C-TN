@@ -85,7 +85,7 @@ public class FlashSaleService {
                     productFlashSale.setQuota(productFlashSaleDTO.getQuota());
                     productFlashSale.setDiscountPercentage(productFlashSaleDTO.getDiscountPercentage());
                     productFlashSale.setSoldCount(0);
-                    productFlashSale.setIsActive(flashSaleDTO.getIsActive()); // Đồng bộ trạng thái
+                    productFlashSale.setIsActive(flashSaleDTO.getIsActive()); 
                     productFlashSale.setProduct(product);
                     productFlashSale.setFlashSale(savedFlashSale);
 
@@ -123,7 +123,7 @@ public class FlashSaleService {
                             variantFlashSale.setOriginalPrice(originalPrice.doubleValue());
                             variantFlashSale.setFlashSalePrice(flashSalePrice.doubleValue());
                             variantFlashSale.setDiscountPercentage(productFlashSale.getDiscountPercentage());
-                            variantFlashSale.setIsActive(flashSaleDTO.getIsActive()); // Đồng bộ trạng thái
+                            variantFlashSale.setIsActive(flashSaleDTO.getIsActive()); 
                             variantFlashSales.add(variantFlashSale);
                         }
                         if (!variantFlashSales.isEmpty()) {
@@ -144,7 +144,6 @@ public class FlashSaleService {
         }
     }
 
-    /**Thêm sản phẩm vào FlashSale hiện có*/
     /**Thêm sản phẩm vào FlashSale hiện có*/
     @Transactional
     public ProductFlashSaleDTO addProductToFlashSale(Long flashSaleId, Long productId, Integer quota, Double discountPercentage)
@@ -175,7 +174,7 @@ public class FlashSaleService {
             productFlashSale.setQuota(quota);
             productFlashSale.setDiscountPercentage(discountPercentage);
             productFlashSale.setSoldCount(0);
-            productFlashSale.setIsActive(flashSale.getIsActive()); // Đồng bộ trạng thái với FlashSale
+            productFlashSale.setIsActive(flashSale.getIsActive()); 
             productFlashSale.setProduct(product);
             productFlashSale.setFlashSale(flashSale);
 
@@ -216,7 +215,7 @@ public class FlashSaleService {
                     variantFlashSale.setOriginalPrice(originalPrice.doubleValue());
                     variantFlashSale.setFlashSalePrice(flashSalePrice.doubleValue());
                     variantFlashSale.setDiscountPercentage(productFlashSale.getDiscountPercentage());
-                    variantFlashSale.setIsActive(flashSale.getIsActive()); // Đồng bộ trạng thái
+                    variantFlashSale.setIsActive(flashSale.getIsActive()); 
                     variantFlashSales.add(variantFlashSale);
                 }
 
@@ -229,7 +228,6 @@ public class FlashSaleService {
             flashSale.getProductFlashSales().add(savedProductFlashSale);
             flashSaleRepository.save(flashSale);
 
-            // Trả về DTO của ProductFlashSale đã lưu
             return flashSaleMapper.toProductFlashSaleDTO(savedProductFlashSale);
         } catch (Exception e) {
             System.err.println("Lỗi khi thêm sản phẩm vào FlashSale: " + e.getMessage());
@@ -263,7 +261,6 @@ public class FlashSaleService {
                 productVariantFlashSaleRepository.saveAll(variantFlashSales);
             }
 
-            // Trả về DTO của ProductFlashSale đã cập nhật
             return flashSaleMapper.toProductFlashSaleDTO(updatedProductFlashSale);
         } catch (Exception e) {
             System.err.println("Lỗi khi vô hiệu hóa ProductFlashSale: " + e.getMessage());
@@ -290,13 +287,10 @@ public class FlashSaleService {
         // Tính giá flash sale dựa trên giá gốc và tỷ lệ giảm giá
         double flashSalePrice = productFlashSale.getOriginalPrice() * discountFactor;
 
-        // Làm tròn giá flash sale nếu cần
         productFlashSale.setFlashSalePrice(flashSalePrice);
     }
 
-    /**
-     * Tính phần trăm giảm giá dựa vào giá flash sale và giá gốc
-     */
+    /**Tính phần trăm giảm giá dựa vào giá flash sale và giá gốc*/
     private void calculateDiscountPercentageFromPrice(ProductFlashSale productFlashSale) {
         double discountPercentage = (1 - (productFlashSale.getFlashSalePrice()
                 / productFlashSale.getOriginalPrice())) * 100;
@@ -304,9 +298,7 @@ public class FlashSaleService {
         productFlashSale.setDiscountPercentage(roundedDiscountPercentage);
     }
 
-    /**
-     * Kiểm tra tính hợp lệ của flash sale
-     */
+    /**Kiểm tra tính hợp lệ của flash sale*/
     private void validateFlashSale(FlashSaleDTO flashSaleDTO) throws BadRequestException {
         if (flashSaleDTO.getName() == null || flashSaleDTO.getName().trim().isEmpty()) {
             throw new BadRequestException("Tên flash sale không được để trống");
@@ -324,7 +316,6 @@ public class FlashSaleService {
             throw new BadRequestException("Thời gian bắt đầu phải trước thời gian kết thúc");
         }
 
-        // Kiểm tra thời lượng tối thiểu và tối đa của flash sale nếu cần
         long durationInMillis = flashSaleDTO.getEndTime().getTime() - flashSaleDTO.getStartTime().getTime();
         long durationInHours = durationInMillis / (60 * 60 * 1000);
 
@@ -337,9 +328,7 @@ public class FlashSaleService {
         }
     }
 
-    /**
-     * Kiểm tra tính hợp lệ của sản phẩm flash sale
-     */
+    /**Kiểm tra tính hợp lệ của sản phẩm flash sale */
     private void validateProductFlashSale(ProductFlashSale productFlashSale) throws BadRequestException {
         // Kiểm tra originalPrice (có thể lấy từ sản phẩm)
         if (productFlashSale.getOriginalPrice() == null) {
@@ -399,17 +388,14 @@ public class FlashSaleService {
 
             // --- Xóa ProductFlashSale ---
             productFlashSaleRepository.deleteByFlashSale_FlashSaleId(flashSaleId);
-
-            // --- Cập nhật FlashSale: status = ENDED, isActive = false ---
+            
             flashSale.setStatus("ENDED");
             flashSale.setIsActive(false);
             flashSaleRepository.save(flashSale);
         }
     }
 
-    /**
-     * Phương thức để kích hoạt các FlashSale từ trạng thái UPCOMING sang STARTING khi đến thời gian bắt đầu
-     */
+    /**Phương thức để kích hoạt các FlashSale từ trạng thái UPCOMING sang STARTING khi đến thời gian bắt đầu*/
     @Transactional
     public void activateUpcomingFlashSales() {
         Date now = new Date();
