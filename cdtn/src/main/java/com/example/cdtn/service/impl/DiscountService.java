@@ -51,13 +51,10 @@ public class DiscountService {
         // Kiểm tra dữ liệu đầu vào
         validateDiscountData(discountDTO);
 
-        // Chuyển đổi từ DTO sang Entity
         Discount discount = discountMapper.toDiscountEntity(discountDTO);
 
-        // Lưu vào cơ sở dữ liệu
         Discount savedDiscount = discountRepository.save(discount);
 
-        // Chuyển đổi từ Entity sang DTO và trả về
         return discountMapper.toDiscountDTO(savedDiscount);
     }
 
@@ -84,18 +81,13 @@ public class DiscountService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Cập nhật thông tin một chương trình giảm giá
-     * @param discountDTO Thông tin cập nhật
-     * @return DiscountDTO Thông tin chương trình giảm giá đã được cập nhật
-     */
+    /**Cập nhật thông tin một chương trình giảm giá */
     @Transactional
     public DiscountDTO updateDiscount(Long discountId, DiscountDTO discountDTO) {
         // Lấy bản ghi gốc từ DB bằng discountId truyền vào
         Discount existingDiscount = discountRepository.findById(discountId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy chương trình giảm giá với ID: " + discountId));
 
-        // Cập nhật 4 thuộc tính nếu chúng khác null
         if (discountDTO.getDiscountName() != null) {
             existingDiscount.setDiscountName(discountDTO.getDiscountName());
         }
@@ -112,7 +104,6 @@ public class DiscountService {
             existingDiscount.setMinOrderValue(discountDTO.getMinOrderValue());
         }
 
-        // Lưu và trả về DTO
         Discount updatedDiscount = discountRepository.save(existingDiscount);
         return discountMapper.toDiscountDTO(updatedDiscount);
     }
@@ -126,7 +117,6 @@ public class DiscountService {
         Discount existingDiscount = discountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy chương trình giảm giá với ID: " + id));
 
-        // Xóa khỏi cơ sở dữ liệu
         discountRepository.delete(existingDiscount);
     }
 
