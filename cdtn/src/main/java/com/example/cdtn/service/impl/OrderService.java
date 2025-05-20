@@ -481,7 +481,7 @@ public class OrderService {
             case 6: // Trả hàng
                 restoreInventory(order); // Khôi phục tồn kho
                 createReturnOrder(order, reason);
-                updateInvoiceStatus(order, 4L); // Cập nhật hóa đơn thành "Hoàn tiền"
+                updateInvoiceStatus(order, 4L); // Cập nhật hóa đơn thành "Đã thanh toán"
                 break;
         }
 
@@ -766,7 +766,6 @@ public class OrderService {
             }
         }
 
-        // Đơn hàng phù hợp với tất cả các điều kiện
         return null;
     }
 
@@ -781,7 +780,6 @@ public class OrderService {
                         item.getProductVariant().getWeightVariant() : 0.0;
                 totalWeight += itemWeight * item.getQuantity();
             } else if (item.getProduct() != null) {
-                // Sử dụng trọng lượng từ sản phẩm nếu không có biến thể
                 Double itemWeight = item.getProduct().getWeight() != null ?
                         item.getProduct().getWeight() : 0.0;
                 totalWeight += itemWeight * item.getQuantity();
