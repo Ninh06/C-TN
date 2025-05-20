@@ -51,7 +51,6 @@ public class AddressService {
 
         Address address = addressMapper.toAddressEntity(addressDTO);
 
-        // Đảo ngược quan hệ để tránh lỗi khi lưu (vì seller và warehouse là bên mappedBy)
         address.setSeller(null);
         address.setWarehouse(null);
 
@@ -84,9 +83,6 @@ public class AddressService {
     public AddressDTO updateAddress(Long id, AddressDTO addressDTO) {
         Address existingAddress = addressRepository.findById(id)
                 .orElseThrow(() -> new OurException("Không tìm thấy địa chỉ với ID: " + id));
-
-        // Thay vì validate toàn bộ DTO, chỉ cập nhật các trường không null
-        // và giữ nguyên giá trị cũ nếu trường tương ứng trong DTO là null
 
         if (addressDTO.getStreetAddress1() != null) {
             existingAddress.setStreetAddress1(addressDTO.getStreetAddress1());
@@ -142,14 +138,12 @@ public class AddressService {
             sellerRepository.save(seller);
             updatedAddress.setSeller(seller);
         } else if (addressDTO.getSeller() != null && addressDTO.getSeller().getSellerId() == null) {
-            // Nếu DTO chỉ định rõ ràng rằng cần xóa liên kết seller (sellerId = null)
             if (existingAddress.getSeller() != null) {
                 existingAddress.getSeller().setAddress(null);
                 sellerRepository.save(existingAddress.getSeller());
                 updatedAddress.setSeller(null);
             }
         }
-        // Nếu addressDTO.getSeller() là null thì giữ nguyên liên kết cũ
 
         // Cập nhật liên kết với Warehouse nếu có thay đổi
         if (addressDTO.getWarehouse() != null && addressDTO.getWarehouse().getId() != null) {
@@ -174,7 +168,6 @@ public class AddressService {
                 updatedAddress.setWarehouse(null);
             }
         }
-        // Nếu addressDTO.getWarehouse() là null thì giữ nguyên liên kết cũ
 
         return addressMapper.toAddressDTO(updatedAddress);
     }
@@ -224,10 +217,7 @@ public class AddressService {
         return addressMapper.toAddressDTO(warehouse.getAddress());
     }
 
-    /**
-     * Kiểm tra tính hợp lệ của dữ liệu địa chỉ
-     * @param addressDTO DTO địa chỉ cần kiểm tra
-     */
+    /**Kiểm tra tính hợp lệ của dữ liệu địa chỉ*/
     private void validateAddressData(AddressDTO addressDTO) {
         if (addressDTO == null) {
             throw new OurException("Dữ liệu địa chỉ không được để trống");
@@ -250,10 +240,7 @@ public class AddressService {
         }
     }
 
-    /**
-     * Kiểm tra các trường không được để trống trong địa chỉ
-     * @param address Đối tượng địa chỉ cần kiểm tra
-     */
+    /**Kiểm tra các trường không được để trống trong địa chỉ */
     private void validateNonEmptyFields(Address address) {
         if (address.getStreetAddress1() != null && address.getStreetAddress1().trim().isEmpty()) {
             throw new OurException("Địa chỉ đường phố 1 không được để trống");
