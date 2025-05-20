@@ -71,8 +71,6 @@ public class ReturnOrderService {
         if (returnOrderRepository.existsByOrder(order)) {
             throw new IllegalStateException("Order này đã có yêu cầu trả hàng");
         }
-
-        // Lấy orderStatus_id = 6 (Hoàn trả hàng)
         OrderStatus returnStatus = orderStatusRepository.findById(6L)
                 .orElseThrow(() -> new OurException("Không tìm thấy trạng thái 'Hoàn trả hàng' (orderStatus_id = 6)"));
 
@@ -80,7 +78,7 @@ public class ReturnOrderService {
         ReturnOrder returnOrder = orderMapper.toReturnOrderEntity(returnOrderDTO);
         returnOrder.setBuyer(buyer);
         returnOrder.setOrder(order);
-        returnOrder.setOrderStatus(returnStatus); // Gán trạng thái cho ReturnOrder
+        returnOrder.setOrderStatus(returnStatus);
         returnOrder.setCreatedAt(new Date());
 
         // Cập nhật orderStatus_id của Order thành 6 (Hoàn trả hàng)
@@ -145,7 +143,6 @@ public class ReturnOrderService {
             originalOrder.setOrderStatus(newStatus);
             orderRepository.save(originalOrder);
 
-            // Khôi phục lại tồn kho (nếu cần)
             restoreInventory(originalOrder);
         }
 
@@ -157,9 +154,6 @@ public class ReturnOrderService {
     /**Kiểm tra tính hợp lệ khi chuyển trạng thái*/
     private void validateStatusTransition(Long currentStatusId, Long newStatusId) {
         // Kiểm tra các chuyển trạng thái hợp lệ
-        // Ví dụ: Từ "Yêu cầu trả hàng" (6) chỉ có thể chuyển sang "Chấp nhận trả hàng" (7) hoặc "Từ chối trả hàng" (8)
-
-        // Trạng thái yêu cầu trả hàng (6) -> chấp nhận (7) hoặc từ chối (8)
         if (currentStatusId == 6L && (newStatusId != 7L && newStatusId != 8L)) {
             throw new IllegalStateException("Không thể chuyển từ trạng thái 'Yêu cầu trả hàng' sang trạng thái với ID: " + newStatusId);
         }
