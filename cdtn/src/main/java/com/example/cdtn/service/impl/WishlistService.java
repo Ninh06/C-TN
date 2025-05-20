@@ -75,29 +75,28 @@ public class WishlistService {
     /**Xóa product ở Wishlist*/
     @Transactional
     public void removeProductFromWishlist(Long buyerId, Long productId) {
-        // 1. Lấy Buyer
+        // Lấy Buyer
         Buyer buyer = buyerRepository.findById(buyerId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người mua"));
 
-        // 2. Lấy Wishlist của Buyer
+        // Lấy Wishlist của Buyer
         Wishlist wishlist = wishlistRepository.findByBuyer(buyer)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy danh sách mong muốn cho người mua này"));
 
-        // 3. Lấy Product
+        // Lấy Product
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
 
-        // 4. Xóa sản phẩm khỏi Wishlist nếu có
+        // Xóa sản phẩm khỏi Wishlist nếu có
         if (wishlist.getProducts() != null && wishlist.getProducts().contains(product)) {
             wishlist.getProducts().remove(product);
         } else {
             throw new OurException("Sản phẩm không tồn tại trong danh sách mong muốn của người mua");
         }
 
-        // 5. Lưu Wishlist đã cập nhật
-        wishlistRepository.save(wishlist);  // Không cần trả về wishlist đã lưu
+        wishlistRepository.save(wishlist);  
 
-        // Không cần trả về bất kỳ đối tượng nào
+      
     }
 
 
