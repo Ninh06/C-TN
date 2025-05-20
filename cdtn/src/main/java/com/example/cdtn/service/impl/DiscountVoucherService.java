@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DiscountVoucherService {
     @Autowired
-    @Getter // Thêm getter cho repository để controller có thể truy cập
+    @Getter 
     private DiscountVoucherRepository discountVoucherRepository;
 
     @Autowired
@@ -64,12 +64,7 @@ public class DiscountVoucherService {
         return discountMapper.toDiscountVoucherDTO(voucher);
     }
 
-    /**
-     * Lấy đối tượng DiscountVoucher theo mã voucher
-     * @param voucherCode Mã voucher cần tìm
-     * @return Đối tượng DiscountVoucher
-     * @throws OurException nếu không tìm thấy voucher với mã được cung cấp
-     */
+    /**Lấy đối tượng DiscountVoucher theo mã voucher*/
     @Transactional(readOnly = true)
     public DiscountVoucher getVoucherEntityByCode(String voucherCode) {
         return discountVoucherRepository.findByVoucherCode(voucherCode)
@@ -166,13 +161,7 @@ public class DiscountVoucherService {
         }
     }
 
-    /**
-     * Áp dụng voucher vào đơn hàng
-     * @param voucherCode Mã voucher
-     * @param orderAmount Tổng giá trị đơn hàng
-     * @return Số tiền giảm giá
-     * @throws IllegalArgumentException nếu voucher không hợp lệ
-     */
+    /** Áp dụng voucher vào đơn hàng*/
     @Transactional(readOnly = true)
     public double applyVoucher(String voucherCode, double orderAmount) {
         DiscountVoucher voucher = discountVoucherRepository.findByVoucherCode(voucherCode)
