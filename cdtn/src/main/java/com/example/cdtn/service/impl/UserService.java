@@ -94,9 +94,9 @@ public class UserService {
         shoppingCart.setBuyer(buyer);
         wishlist.setBuyer(buyer);
 
-        // Lưu buyer (cascade sẽ tự động lưu shoppingCart và wishlist)
+        
         buyerRepository.save(buyer);
-        buyerRepository.flush(); // Đảm bảo dữ liệu được ghi vào cơ sở dữ liệu
+        buyerRepository.flush(); 
 
         // Cập nhật user
         user.setBuyer(buyer);
@@ -132,13 +132,13 @@ public class UserService {
             address.setSeller(seller);
         }
 
-        // Tạo kho hàng (warehouse) cho người bán
+        // Tạo kho hàng cho người bán
         Warehouse warehouse = new Warehouse();
         warehouse.setNameWarehouse(request.getNameWarehouse());
         warehouse.setCompanyName(request.getCompanyName());
         warehouse.setSeller(seller);
         warehouse.setAddress(seller.getAddress());
-        // Có thể thiết lập các thuộc tính khác của warehouse nếu cần
+        
         seller.setWarehouse(warehouse);
 
         user.setSeller(seller);
@@ -282,16 +282,12 @@ public class UserService {
             Buyer buyer = buyerRepository.findByUser_UserId(userId)
                     .orElseThrow(() -> new OurException("User không phải là buyer hoặc chưa đăng ký buyer."));
 
-            // Quan trọng: Tắt mối quan hệ giữa User và Buyer trước khi xóa Buyer
             user.setBuyer(null);
             userRepository.save(user);
 
             // Đổi userType thành SELLER
             user.setUserType("SELLER");
             user = userRepository.save(user);
-
-            // Xóa buyer khỏi DB một cách riêng biệt
-            // Quan trọng: Không xóa Buyer trong cùng giao dịch, tạo một giao dịch mới
             deleteBuyerSafely(buyer.getBuyerId());
 
             // Tạo Seller mới
